@@ -1,0 +1,65 @@
+body {
+document.getElementById('stopBtn').onclick = () => {
+  gameActive = false;
+  clearInterval(spawnInterval);
+  document.getElementById('startBtn').disabled = false;
+  document.getElementById('stopBtn').disabled = true;
+  enemies.forEach(e => arena.removeChild(e.el));
+  enemies = [];
+};
+
+function spawnEnemy() {
+  if (!gameActive) return;
+  const enemy = document.createElement('div');
+  enemy.classList.add('enemy');
+  enemy.style.left = Math.random() * 470 + 'px';
+  enemy.style.top = Math.random() * 270 + 'px';
+  arena.appendChild(enemy);
+  enemies.push({ el: enemy });
+
+  enemy.onclick = () => {
+    arena.removeChild(enemy);
+    enemies = enemies.filter(e => e.el !== enemy);
+    score += 10;
+    scoreSpan.textContent = score;
+  };
+
+  setTimeout(() => {
+    if (arena.contains(enemy)) {
+      arena.removeChild(enemy);
+      enemies = enemies.filter(e => e.el !== enemy);
+      health = Math.max(0, health - 10);
+      healthSpan.textContent = health;
+    }
+  }, 3000);
+}
+
+// Admin login
+document.getElementById('loginBtn').onclick = () => {
+  const pw = document.getElementById('adminPassword').value;
+  if (pw === 'admin123') {
+    document.getElementById('loginSection').style.display = 'none';
+    document.getElementById('adminControls').style.display = 'block';
+  } else {
+    alert('Incorrect password');
+  }
+};
+
+// Admin controls
+document.getElementById('spawnRate').onchange = (e) => {
+  spawnRate = Number(e.target.value);
+  if (gameActive) {
+    clearInterval(spawnInterval);
+    spawnInterval = setInterval(spawnEnemy, spawnRate);
+  }
+};
+
+document.getElementById('resetHealth').onclick = () => {
+  health = 100;
+  healthSpan.textContent = health;
+};
+
+document.getElementById('resetScore').onclick = () => {
+  score = 0;
+  scoreSpan.textContent = score;
+};
